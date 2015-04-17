@@ -1,12 +1,6 @@
 package uk.co.myspots
 
-import org.scalatest._
-import spray.testkit.ScalatestRouteTest
-
-/**
- * Created by uberto on 16/04/15.
- */
-class UserServiceSpec extends WordSpec with ScalatestRouteTest with PingService with ShouldMatchers {
+class UserServiceSpec extends RestApiRouteSpec with PingService {
 
     def actorRefFactory = system // connect the DSL to the test ActorSystem
 
