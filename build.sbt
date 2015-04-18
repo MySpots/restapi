@@ -12,5 +12,6 @@ libraryDependencies ++= Seq(
 // would be good to use this, but lacks doc  "com.typesafe.akka" %% "akka-http-experimental" % "1.0-M5",
   "com.typesafe.akka" %% "akka-actor" % "2.3.9",
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  "io.spray" %% "spray-testkit" % "1.3.3" % "test"
+  "io.spray" %% "spray-testkit" % "1.3.3" % "test",
+  "io.spray" %%  "spray-json" % "1.3.1"
 )

@@ -4,8 +4,8 @@ import akka.actor.Actor
 import spray.http.{StatusCodes, HttpEntity, HttpCharsets, MediaTypes}
 import spray.httpx.unmarshalling.Unmarshaller
 import spray.routing.{RequestContext, HttpService}
-//import spray.json._
-//import DefaultJsonProtocol._ // if you don't supply your own Protocol (see below)
+import spray.json._
+import RestApiJsonProtocol._
 
 
 class PingServiceActor extends Actor with PingService {
@@ -27,21 +27,13 @@ trait PingService extends HttpService {
     } ~
     path("user" / Segment){ userName =>
       put{
-//        entity(Unmarshaller(MediaTypes.`application/json`) {
-//          case httpEntity: HttpEntity => new User()
-//            read[User](httpEntity.asString(HttpCharsets.`UTF-8`))
-//        }) {
-          complete{ "Created user " + userName
 
-          StatusCodes.Created
+        entity(as[User]) { user => //extract json Bar from post body
+            complete {
+              "Created user " + userName + "  " + user.toJson
+              StatusCodes.Created
+            }
           }
-         // StatusCodes.Created
-              //user: User =>
-             //  ctx: RequestContext =>
-            //  handleRequest(ctx, StatusCodes.Created) {
-              //  log.debug("Creating user: %s".format(user))
-              //  customerService.create(customer)
-//              }
         }
       }
 
