@@ -1,7 +1,6 @@
 # restapi
 Backend rest api for my spots
 
-
 ## Instructions
 To start the server, run the Boot class
 
