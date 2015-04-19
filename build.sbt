@@ -6,12 +6,16 @@ version := "1.0"
 
 scalaVersion := "2.11.6"
 
+val sprayVersion = "1.3.3"
+
 libraryDependencies ++= Seq(
-  "io.spray" %% "spray-routing" % "1.3.3",
-  "io.spray" %% "spray-can" % "1.3.3",
-// would be good to use this, but lacks doc  "com.typesafe.akka" %% "akka-http-experimental" % "1.0-M5",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.9",
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  "io.spray" %% "spray-testkit" % "1.3.3" % "test",
-  "io.spray" %%  "spray-json" % "1.3.1"
+
+  "io.spray"          %% "spray-routing"  % sprayVersion          ,
+  "io.spray"          %% "spray-can"      % sprayVersion          ,
+  "io.spray"          %% "spray-json"     % "1.3.1"               ,
+  "com.typesafe.akka" %% "akka-actor"     % "2.3.9"               ,
+
+  "org.scalatest"     %% "scalatest"      % "2.2.4"       % "test",
+  "io.spray"          %% "spray-testkit"  % sprayVersion  % "test"
+
 )

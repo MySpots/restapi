@@ -5,7 +5,9 @@ import akka.io.IO
 import akka.util.Timeout
 import spray.can.Http
 import akka.pattern.ask
+import uk.co.myspots.actors.ApiActor
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object Boot {
 
@@ -14,11 +16,9 @@ object Boot {
     implicit val system = ActorSystem("myspots")
     implicit val timeout = Timeout(5 seconds)
 
+    val api = system.actorOf(Props[ApiActor])
 
-    // we'll need to have a "route actor" that deals with all the different routings. the routes may be in different files.
-    val service = system.actorOf(Props[PingServiceActor])
-
-    IO(Http) ? Http.Bind(service, interface = "localhost", port = 8080)
+    IO(Http) ? Http.Bind(api, interface = "localhost", port = 8080)
   }
 
 }
