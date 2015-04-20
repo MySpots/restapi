@@ -43,6 +43,15 @@ class UserServiceSpec extends ServiceSpec with UserService {
           status shouldBe StatusCodes.NotFound
         }
       }
+
+      "return OK when retriving the spots of a user" in {
+
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+
+        Get("/user/uberto/spots") ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.OK
+        }
+      }
     }
   }
 

@@ -22,22 +22,32 @@ trait UserService extends HttpService {
 
   def userRoute(userActor: ActorRef) =
 
-    path("user" / Segment) { username =>
-      put {
-        entity(as[User]) { user =>
-          complete {
-            userActor ! CreateUser(user)
-            "Created user " + username + "  " + user.toJson
-            StatusCodes.Created
+    pathPrefix("user" / Segment) { username =>
+      pathEnd {
+        put {
+          entity(as[User]) { user =>
+            complete {
+              userActor ! CreateUser(user)
+              "Created user " + username + "  " + user.toJson
+              StatusCodes.Created
+            }
+          }
+        } ~ get {
+          onSuccess(ask(userActor, GetUser(username)).mapTo[Option[User]]) {
+            // getOrElse or fold don't work we would be using two different complete, but we shouldn't patmatch on Options
+            case Some(user) => complete(user)
+            case _ => complete(StatusCodes.NotFound)
           }
         }
-      } ~ get {
-        onSuccess(ask(userActor, GetUser(username)).mapTo[Option[User]]) {
-          // getOrElse or fold don't work we would be using two different complete, but we shouldn't patmatch on Options
-          case Some(user) => complete(user)
-          case _ => complete(StatusCodes.NotFound)
+      } ~ path("spots") {
+        get {
+          // complete( 500, "get all spots of user") //todo
+          complete(StatusCodes.OK)
+        } ~ post {
+          complete(500, "add a spot to user ") //todo
         }
       }
+
     }
 
 }
