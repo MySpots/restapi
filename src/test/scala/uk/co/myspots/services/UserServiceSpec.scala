@@ -4,11 +4,13 @@ import akka.testkit.TestActorRef
 import spray.http.StatusCodes
 import uk.co.myspots.actors.UserActor
 import uk.co.myspots.model.RestApiJsonProtocol._
-import uk.co.myspots.model.{RestApiJsonProtocol, User}
+import uk.co.myspots.model.{Spot, RestApiJsonProtocol, User}
 
 class UserServiceSpec extends ServiceSpec with UserService {
 
   val uberto = User("Uberto", "Barbini", 0, "uberto")
+
+  val google = Spot("http://www.google.com", "google", 0, "", 0, "", List())
 
   val userActor = TestActorRef[UserActor]
 
@@ -47,6 +49,7 @@ class UserServiceSpec extends ServiceSpec with UserService {
       "return OK when retriving the spots of a user" in {
 
         Put("/user/uberto", uberto) ~> userRoute(userActor)
+        Post("/user/uberto/spots", google) ~> userRoute(userActor)
 
         Get("/user/uberto/spots") ~> userRoute(userActor) ~> check {
           status shouldBe StatusCodes.OK

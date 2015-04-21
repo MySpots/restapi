@@ -7,9 +7,10 @@ import akka.util.Timeout
 import spray.http.StatusCodes
 import spray.json._
 import spray.routing.HttpService
-import uk.co.myspots.actors.{GetUser, CreateUser}
-import uk.co.myspots.model.{RestApiJsonProtocol, User}
+import uk.co.myspots.actors.{AddSpotToUser, GetAllSpots, GetUser, CreateUser}
+import uk.co.myspots.model.{Spot, RestApiJsonProtocol, User}
 import akka.pattern.ask
+import scala.collection.immutable.Stream.Empty
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -28,7 +29,6 @@ trait UserService extends HttpService {
           entity(as[User]) { user =>
             complete {
               userActor ! CreateUser(user)
-              "Created user " + username + "  " + user.toJson
               StatusCodes.Created
             }
           }
@@ -41,10 +41,19 @@ trait UserService extends HttpService {
         }
       } ~ path("spots") {
         get {
-          // complete( 500, "get all spots of user") //todo
-          complete(StatusCodes.OK)
+          onSuccess(ask(userActor, GetAllSpots(username)).mapTo[Option[List[Spot]]]) {
+            // todo: thinking about Spots Actor as child of User Actor
+            case Some(l) => complete(l)
+            case _ => complete(StatusCodes.NotFound)
+          }
+
         } ~ post {
-          complete(500, "add a spot to user ") //todo
+          entity(as[Spot]) { spot =>
+            complete {
+              userActor ! AddSpotToUser(username, spot)
+              StatusCodes.Created
+            }
+          }
         }
       }
 
