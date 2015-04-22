@@ -10,17 +10,18 @@ class UserActor extends Actor {
   var spots = Map.empty[String, List[Spot]]
 
   override def receive = {
-    case CreateUser(user) => {
+    case CreateUser(user) =>
       users = users + user
       spots += user.userId -> List()
-    }
     case GetUser(username) =>
       sender ! users.find(_.userId == username)
     case GetAllSpots(username) =>
       sender ! spots.get(username)
-    case AddSpotToUser(username, spot) =>
-        spots += username -> (spot :: spots(username))  //todo: check for existing user
+    case AddSpotToUser(userId, spot) =>
+      users.find(_.userId == userId).foreach { _ =>
+        spots += userId -> (spot :: spots(userId))
+      }
 
-    }
+  }
 
 }
