@@ -11,10 +11,12 @@ class UserActor extends Actor {
 
   override def receive = {
     case CreateUser(user) =>
-      users = users + user
+      users += user
       spots += user.userId -> List()
     case GetUser(username) =>
       sender ! users.find(_.userId == username)
+    case DeleteUser(username) =>
+      users.find(_.userId == username).foreach(users -= _)
     case GetAllSpots(username) =>
       sender ! spots.get(username)
     case AddSpotToUser(userId, spot) =>

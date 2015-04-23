@@ -47,7 +47,28 @@ class UserServiceSpec extends ServiceSpec with UserService {
         }
       }
 
-      "return list of spots when retriving the spots of a user" in {
+    }
+
+    "deleting a user" should {
+      "return a 204 on a DELETE /user/$username" in {
+
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+
+        Delete("/user/uberto", uberto) ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.NoContent
+
+          userActor.underlyingActor.users should not contain uberto
+        }
+
+        Get("/user/uberto") ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.NotFound
+        }
+      }
+    }
+
+    "retrieving the list of spots of a user" should {
+
+      "return list of spots when user exists" in {
 
         Put("/user/uberto", uberto) ~> userRoute(userActor)
         Post("/user/uberto/spots", google) ~> userRoute(userActor)
@@ -58,7 +79,16 @@ class UserServiceSpec extends ServiceSpec with UserService {
         }
       }
 
-      "return 404 when retriving the spots of a user not found" in {
+      "return empty list if user didn't add spots" in {
+
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+
+        Get("/user/uberto/spots") ~> userRoute(userActor) ~> check {
+          responseAs[List[Spot]] shouldBe List()
+        }
+      }
+
+      "return 404 when user is not present" in {
 
        Get("/user/maccio/spots") ~> userRoute(userActor) ~> check {
          status shouldBe StatusCodes.NotFound

@@ -7,7 +7,7 @@ import akka.util.Timeout
 import spray.http.StatusCodes
 import spray.json._
 import spray.routing.HttpService
-import uk.co.myspots.actors.{AddSpotToUser, GetAllSpots, GetUser, CreateUser}
+import uk.co.myspots.actors._
 import uk.co.myspots.model.{Spot, RestApiJsonProtocol, User}
 import akka.pattern.ask
 import scala.collection.immutable.Stream.Empty
@@ -38,6 +38,11 @@ trait UserService extends HttpService {
             case Some(user) => complete(user)
             case _ => complete(StatusCodes.NotFound)
           }
+        } ~ delete {
+            complete{
+              userActor ! DeleteUser(username)
+                StatusCodes.NoContent
+            }
         }
       } ~ path("spots") {
         get {
