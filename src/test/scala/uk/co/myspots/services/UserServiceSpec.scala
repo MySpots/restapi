@@ -11,6 +11,7 @@ class UserServiceSpec extends ServiceSpec with UserService {
   val uberto = User("Uberto", "Barbini", 0, "uberto")
 
   val google = Spot("http://www.google.com", "google", 0, "", 0, "", List())
+  val facebook = Spot("http://www.facebook.com", "fb", 0, "", 0, "", List())
 
   val userActor = TestActorRef[UserActor]
 
@@ -46,13 +47,21 @@ class UserServiceSpec extends ServiceSpec with UserService {
         }
       }
 
-      "return OK when retriving the spots of a user" in {
+      "return list of spots when retriving the spots of a user" in {
 
         Put("/user/uberto", uberto) ~> userRoute(userActor)
         Post("/user/uberto/spots", google) ~> userRoute(userActor)
+        Post("/user/uberto/spots", facebook) ~> userRoute(userActor)
 
         Get("/user/uberto/spots") ~> userRoute(userActor) ~> check {
-          status shouldBe StatusCodes.OK
+          responseAs[List[Spot]] shouldBe List(facebook, google)
+        }
+      }
+
+      "return 404 when retriving the spots of a user not found" in {
+
+       Get("/user/maccio/spots") ~> userRoute(userActor) ~> check {
+         status shouldBe StatusCodes.NotFound
         }
       }
     }
