@@ -54,9 +54,10 @@ trait UserService extends HttpService {
 
         } ~ post {
           entity(as[Spot]) { spot =>
-            complete {
-              userActor ! AddSpotToUser(username, spot)
-              StatusCodes.Created
+
+            onSuccess(ask(userActor, AddSpotToUser(username, spot)).mapTo[Option[String]]) {
+              case Some(id) => redirect("/" + username + "/spots/" + id, StatusCodes.SeeOther )
+              case _ => complete(StatusCodes.NotFound)
             }
           }
         }

@@ -21,7 +21,7 @@ class UserActorSpec extends TestKit(ActorSystem("testsystem")) with WordSpecLike
         val anUser = User("Maccio", "Capatonda", 0, "maccio")
         userActor ! CreateUser(anUser)
 
-        val aSpot = Spot("link", "title", 0, "maccio", 0, "test", List.empty)
+        val aSpot = Spot("link", "title", 0, "maccio", 0, List.empty)
         userActor ! AddSpotToUser(anUser.userId, aSpot)
 
         val spots = userActor.underlyingActor.spots
@@ -32,7 +32,7 @@ class UserActorSpec extends TestKit(ActorSystem("testsystem")) with WordSpecLike
 
         val userActor = TestActorRef[UserActor]
 
-        val aSpot = Spot("link", "title", 0, "maccio", 0, "test", List.empty)
+        val aSpot = Spot("link", "title", 0, "maccio", 0, List.empty)
         userActor ! AddSpotToUser("maccio", aSpot)
 
         val spots = userActor.underlyingActor.spots

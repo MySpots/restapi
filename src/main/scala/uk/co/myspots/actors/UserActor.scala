@@ -19,11 +19,14 @@ class UserActor extends Actor {
       users.find(_.userId == username).foreach(users -= _)
     case GetAllSpots(username) =>
       sender ! spots.get(username)
-    case AddSpotToUser(userId, spot) =>
-      users.find(_.userId == userId).foreach { _ =>
-        spots += userId -> (spot :: spots(userId))
+    case AddSpotToUser(userId, spot) => {
+      if (spots.contains(userId))  {
+          val spotId = spot.id
+          spots += userId -> (spot :: spots(userId))
+          sender ! Some(spotId)
+        } else
+          sender ! None
       }
-
-  }
+    }
 
 }
