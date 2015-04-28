@@ -44,25 +44,38 @@ trait UserService extends HttpService {
                 StatusCodes.NoContent
             }
         }
-      } ~ path("spots") {
-        get {
-          onSuccess(ask(userActor, GetAllSpots(username)).mapTo[Option[Map[String, Spot]]]) {
-            // todo: thinking about Spots Actor as child of User Actor
-            case Some(l) => complete(l)
-            case _ => complete(StatusCodes.NotFound)
-          }
-
-        } ~ post {
-          entity(as[Spot]) { spot =>
-
-            onSuccess(ask(userActor, AddSpotToUser(username, spot)).mapTo[Option[String]]) {
-              case Some(id) => redirect("/" + username + "/spots/" + id, StatusCodes.SeeOther )
+      } ~ pathPrefix("spots") {
+        pathEnd {
+          get {
+            onSuccess(ask(userActor, GetAllSpots(username)).mapTo[Option[Map[String, Spot]]]) {
+              // todo: thinking about Spots Actor as child of User Actor
+              case Some(l) => complete(l)
               case _ => complete(StatusCodes.NotFound)
+            }
+
+          } ~ post {
+            entity(as[Spot]) { spot =>
+
+              onSuccess(ask(userActor, AddSpotToUser(username, spot)).mapTo[Option[String]]) {
+                case Some(id) => redirect("/" + username + "/spots/" + id, StatusCodes.SeeOther )
+                case _ => complete(StatusCodes.NotFound)
+              }
+            }
+          }
+        } ~ pathPrefix(Segment) { spotId =>
+            delete {
+              complete {
+                userActor ! DeleteSpot(username, spotId)
+                StatusCodes.NoContent
+              }
+            } ~ get {
+              onSuccess(ask(userActor, GetSpot(username, spotId)).mapTo[Option[Spot]]) {
+                case Some(s) => complete(s)
+                case _ => complete(StatusCodes.NotFound)
+              }
             }
           }
         }
       }
-
-    }
 
 }

@@ -96,7 +96,19 @@ class UserServiceSpec extends ServiceSpec with UserService {
       }
     }
 
-    "addin a spot to a user" should {
+    "retriving a specific spot of a user" should {
+
+      "return spot details when user and spots exist" in {
+
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+        Post("/user/uberto/spots", facebook) ~> userRoute(userActor)
+        Get("/user/uberto/spots/" + facebook.id) ~> userRoute(userActor) ~> check {
+          responseAs[Spot] shouldBe facebook
+        }
+      }
+    }
+
+    "adding a spot to a user" should {
 
       "return redirect link to spot details when user and spots exist" in {
 
@@ -107,9 +119,28 @@ class UserServiceSpec extends ServiceSpec with UserService {
         }
       }
 
-      //todo: delete spot, update spot, get single spot
+    }
+
+    "deleting a spot to a user" should {
+
+      "return 204 when user and spots exist" in {
+
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+        Post("/user/uberto/spots", google) ~> userRoute(userActor)
+        Delete("/user/uberto/spots/" + google.id) ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.NoContent
+        }
+
+        Get("/user/uberto/spots/" + google.id) ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.NotFound
+        }
+      }
 
     }
+
+      //todo: update spot, redirect short url
+
+
   }
 
 }
