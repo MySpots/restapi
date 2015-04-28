@@ -25,7 +25,7 @@ class UserActorSpec extends TestKit(ActorSystem("testsystem")) with WordSpecLike
         userActor ! AddSpotToUser(anUser.userId, aSpot)
 
         val spots = userActor.underlyingActor.spots
-        spots should contain only anUser.userId -> List(aSpot)
+        spots should contain only anUser.userId -> Map(aSpot.id -> aSpot)
       }
 
       "not add a spot if the user hasn't been created" in {

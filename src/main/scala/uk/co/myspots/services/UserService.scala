@@ -46,7 +46,7 @@ trait UserService extends HttpService {
         }
       } ~ path("spots") {
         get {
-          onSuccess(ask(userActor, GetAllSpots(username)).mapTo[Option[List[Spot]]]) {
+          onSuccess(ask(userActor, GetAllSpots(username)).mapTo[Option[Map[String, Spot]]]) {
             // todo: thinking about Spots Actor as child of User Actor
             case Some(l) => complete(l)
             case _ => complete(StatusCodes.NotFound)

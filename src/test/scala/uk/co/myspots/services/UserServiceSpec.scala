@@ -75,7 +75,7 @@ class UserServiceSpec extends ServiceSpec with UserService {
         Post("/user/uberto/spots", facebook) ~> userRoute(userActor)
 
         Get("/user/uberto/spots") ~> userRoute(userActor) ~> check {
-          responseAs[List[Spot]] shouldBe List(facebook, google)
+          responseAs[Map[String, Spot]] shouldBe Map(facebook.id -> facebook,  google.id -> google)
         }
       }
 
@@ -84,7 +84,7 @@ class UserServiceSpec extends ServiceSpec with UserService {
         Put("/user/uberto", uberto) ~> userRoute(userActor)
 
         Get("/user/uberto/spots") ~> userRoute(userActor) ~> check {
-          responseAs[List[Spot]] shouldBe List()
+          responseAs[Map[String, Spot]] shouldBe Map()
         }
       }
 
@@ -106,6 +106,8 @@ class UserServiceSpec extends ServiceSpec with UserService {
           header("Location").get.value shouldBe "/uberto/spots/" + google.id
         }
       }
+
+      //todo: delete spot, update spot, get single spot
 
     }
   }
