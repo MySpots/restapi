@@ -90,12 +90,24 @@ class UserServiceSpec extends ServiceSpec with UserService {
 
       "return 404 when user is not present" in {
 
-       Get("/user/maccio/spots") ~> userRoute(userActor) ~> check {
-         status shouldBe StatusCodes.NotFound
+        Get("/user/maccio/spots") ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.NotFound
         }
       }
     }
-  }
 
+    "addin a spot to a user" should {
+
+      "return redirect link to spot details when user and spots exist" in {
+
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+        Post("/user/uberto/spots", google) ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.SeeOther
+          header("Location").get.value shouldBe "/uberto/spots/" + google.id
+        }
+      }
+
+    }
+  }
 
 }
