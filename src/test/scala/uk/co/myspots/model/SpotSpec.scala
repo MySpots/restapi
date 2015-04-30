@@ -17,9 +17,20 @@ class SpotSpec extends WordSpec with ShouldMatchers {
 
       "create id from link MD5" in {
 
-        val aSpot = Spot("link", "title", 0, "maccio", 0, List.empty)
+        val aSpot = Spot("link", "title", 0, "maccio", 0)
         val id = aSpot.id
         id shouldBe "88fdd8"
+      }
+    }
+
+    "created" should {
+      "populate tag collection" in {
+
+        val aSpot = Spot("link", "title with #tag1 and #tag2", 0, "uberto", 0)
+
+        aSpot.tags.size shouldBe 2
+        aSpot.tags shouldBe List("tag1","tag2")
+
       }
     }
   }

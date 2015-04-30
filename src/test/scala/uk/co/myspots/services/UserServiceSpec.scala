@@ -10,8 +10,8 @@ class UserServiceSpec extends ServiceSpec with UserService {
 
   val uberto = User("Uberto", "Barbini", 0, "uberto")
 
-  val google = Spot("http://www.google.com", "google", 0, "", 0,  List())
-  val facebook = Spot("http://www.facebook.com", "fb", 0, "", 0,  List())
+  val google = Spot("http://www.google.com", "google", 0, "", 0)
+  val facebook = Spot("http://www.facebook.com", "fb", 0, "", 0)
 
   val userActor = TestActorRef[UserActor]
 
