@@ -75,7 +75,16 @@ trait UserService extends HttpService {
               }
             }
           }
-        }
+       } ~ path("search") {
+              get {
+                  parameters("tag"){ tag =>
+                      onSuccess(ask(userActor, SearchSpot(username, tag)).mapTo[Option[Map[String, Spot]]]) {
+                        case Some(m) => complete(m)
+                        case _ => complete(StatusCodes.NotFound)
+                      }
+                  }
+              }
+          }
       }
 
 }

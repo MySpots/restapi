@@ -10,8 +10,10 @@ class UserServiceSpec extends ServiceSpec with UserService {
 
   val uberto = User("Uberto", "Barbini", 0, "uberto")
 
-  val google = Spot("http://www.google.com", "google", 0, "", 0)
-  val facebook = Spot("http://www.facebook.com", "fb", 0, "", 0)
+  val google = Spot("http://www.google.com", "google #search #net", 0, 0)
+  val googleId =google.id(uberto.userId)
+  val facebook = Spot("http://www.facebook.com", "fb #friends #net", 0, 0)
+  val facebookId =facebook.id(uberto.userId)
 
   val userActor = TestActorRef[UserActor]
 
@@ -75,7 +77,7 @@ class UserServiceSpec extends ServiceSpec with UserService {
         Post("/user/uberto/spots", facebook) ~> userRoute(userActor)
 
         Get("/user/uberto/spots") ~> userRoute(userActor) ~> check {
-          responseAs[Map[String, Spot]] shouldBe Map(facebook.id -> facebook,  google.id -> google)
+          responseAs[Map[String, Spot]] shouldBe Map(facebookId -> facebook,  googleId -> google)
         }
       }
 
@@ -102,7 +104,7 @@ class UserServiceSpec extends ServiceSpec with UserService {
 
         Put("/user/uberto", uberto) ~> userRoute(userActor)
         Post("/user/uberto/spots", facebook) ~> userRoute(userActor)
-        Get("/user/uberto/spots/" + facebook.id) ~> userRoute(userActor) ~> check {
+        Get("/user/uberto/spots/" + facebookId) ~> userRoute(userActor) ~> check {
           responseAs[Spot] shouldBe facebook
         }
       }
@@ -115,7 +117,7 @@ class UserServiceSpec extends ServiceSpec with UserService {
         Put("/user/uberto", uberto) ~> userRoute(userActor)
         Post("/user/uberto/spots", google) ~> userRoute(userActor) ~> check {
           status shouldBe StatusCodes.SeeOther
-          header("Location").get.value shouldBe "/uberto/spots/" + google.id
+          header("Location").get.value shouldBe "/uberto/spots/" + googleId
         }
       }
 
@@ -127,12 +129,41 @@ class UserServiceSpec extends ServiceSpec with UserService {
 
         Put("/user/uberto", uberto) ~> userRoute(userActor)
         Post("/user/uberto/spots", google) ~> userRoute(userActor)
-        Delete("/user/uberto/spots/" + google.id) ~> userRoute(userActor) ~> check {
+        Delete("/user/uberto/spots/" + googleId) ~> userRoute(userActor) ~> check {
           status shouldBe StatusCodes.NoContent
         }
 
-        Get("/user/uberto/spots/" + google.id) ~> userRoute(userActor) ~> check {
+        Get("/user/uberto/spots/" + googleId) ~> userRoute(userActor) ~> check {
           status shouldBe StatusCodes.NotFound
+        }
+      }
+
+    }
+
+
+
+    "searching for a tag" should {
+
+
+      "return 404 when tag doesn't exist" in {
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+        Post("/user/uberto/spots", google) ~> userRoute(userActor)
+        Post("/user/uberto/spots", facebook) ~> userRoute(userActor)
+
+        Get("/user/uberto/search?tag=NoSuchTag") ~> userRoute(userActor) ~> check {
+          status shouldBe StatusCodes.NotFound
+        }
+      }
+
+      "return spot list with tag" in {
+
+        Put("/user/uberto", uberto) ~> userRoute(userActor)
+        Post("/user/uberto/spots", google) ~> userRoute(userActor)
+        Post("/user/uberto/spots", facebook) ~> userRoute(userActor)
+
+        Get("/user/uberto/search?tag=friends") ~> userRoute(userActor) ~> check {
+
+          responseAs[Map[String, Spot]] shouldBe Map(facebookId -> facebook)
         }
       }
 

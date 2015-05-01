@@ -21,7 +21,7 @@ class UserActor extends Actor {
       sender ! spots.get(username)
     case AddSpotToUser(username, spot) => {
       if (spots.contains(username)) {
-        val spotId = spot.id
+        val spotId = spot.id( username)
         spots += username -> (spots(username) + (spotId -> spot))
         sender ! Some(spotId)
       } else
@@ -29,6 +29,21 @@ class UserActor extends Actor {
     }
     case GetSpot(username, spotId) =>
       sender ! spots.get(username).flatMap(_.get(spotId))
+
+    case SearchSpot(username, tag) => {
+      val mySpots: Option[Map[String, Spot]] = spots.get(username)
+
+       val resp = mySpots match{
+         case Some(m) => {
+           val fm = m.filter(_._2.tags.contains(tag))
+           if (fm.isEmpty) None else Some(fm)
+         }
+         case _ => None
+       }
+
+      sender ! resp
+
+    }
     case DeleteSpot(username, spotId) => {
       if (spots.contains(username) && spots(username).contains(spotId)) {
         spots += username -> (spots(username) - spotId)
